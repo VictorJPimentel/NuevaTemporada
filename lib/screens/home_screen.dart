@@ -3,17 +3,23 @@ import 'package:nueva_temporada/models/channel_model.dart';
 import 'package:nueva_temporada/models/video_model.dart';
 import 'package:nueva_temporada/screens/video_screen.dart';
 import 'package:nueva_temporada/widgets/nav-drawer.dart';
+import 'package:nueva_temporada/widgets/motionbar.dart';
 import 'package:nueva_temporada/widgets/topvideos.dart';
 import 'package:nueva_temporada/services/api_service.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 //import 'package:webview_flutter/webview_flutter.dart';
+
+import 'package:motion_tab_bar/MotionTabBarView.dart';
+import 'package:motion_tab_bar/MotionTabController.dart';
+import 'package:motion_tab_bar/motiontabbar.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  MotionTabController _tabController;
   Channel _channel;
   bool _isLoading = false;
 
@@ -21,6 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _initChannel();
+    _tabController = MotionTabController(initialIndex: 1, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tabController.dispose();
   }
 
   _initChannel() async {
@@ -102,12 +115,29 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.all(10.0),
               width: 1000.0,
               height: 50.0,
-              decoration: BoxDecoration(color: Colors.teal),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.teal,
+                  width: 1,
+                ),
+                borderRadius: new BorderRadius.only(
+                    topLeft: const Radius.circular(8.0),
+                    topRight: const Radius.circular(8.0)),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(0, 1),
+                    blurRadius: 6.0,
+                  ),
+                ],
+              ),
               child: Text(
                 video.title,
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.0,
+                  color: Colors.black,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -140,119 +170,179 @@ class _HomeScreenState extends State<HomeScreen> {
     _isLoading = false;
   }
 
-  _buildTopVideo(Video video) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => VideoScreen(id: video.id),
-        ),
+  // _buildTopVideo(Video video) {
+  //   return GestureDetector(
+  //     onTap: () => Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (_) => VideoScreen(id: video.id),
+  //       ),
+  //     ),
+  //     child: Container(
+  //       padding: EdgeInsets.all(5.0),
+  //       height: 260.0,
+  //       child: Column(
+  //         children: <Widget>[
+  //           Container(
+  //             padding: EdgeInsets.all(10.0),
+  //             width: 1000.0,
+  //             height: 50.0,
+  //             decoration: new BoxDecoration(
+  //               color: Colors.teal,
+  //               borderRadius: new BorderRadius.only(
+  //                   bottomLeft: const Radius.circular(40.0),
+  //                   bottomRight: const Radius.circular(40.0),
+  //                   topLeft: const Radius.circular(40.0),
+  //                   topRight: const Radius.circular(40.0)),
+  //             ),
+  //             child: Text(
+  //               video.title,
+  //               style: TextStyle(
+  //                 color: Colors.white,
+  //                 fontSize: 14.0,
+  //               ),
+  //             ),
+  //           ),
+  //           Container(
+  //             constraints: BoxConstraints.expand(
+  //               height: 180.0,
+  //             ),
+  //             child: Image.network(video.thumbnailUrl, fit: BoxFit.cover),
+  //             // Image(
+  //             //   width: 350.0,
+  //             //   height: 250.0,
+  //             //   image: NetworkImage(video.thumbnailUrl),
+  //             //   fit: BoxFit.fill,
+  //             // ),
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  _buildProfileInfo() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+      padding: EdgeInsets.all(10.0),
+      height: 100.0,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0, 1),
+            blurRadius: 6.0,
+          ),
+        ],
       ),
-      child: Container(
-        padding: EdgeInsets.all(5.0),
-        height: 260.0,
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(10.0),
-              width: 1000.0,
-              height: 50.0,
-              decoration: BoxDecoration(color: Colors.teal),
-              child: Text(
-                video.title,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.0,
+      child: Row(
+        children: <Widget>[
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            radius: 35.0,
+            backgroundImage: NetworkImage(_channel.profilePictureUrl),
+          ),
+          SizedBox(width: 12.0),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  _channel.title,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
+                Text(
+                  '${_channel.subscriberCount} subscribers',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            Container(
-              constraints: BoxConstraints.expand(
-                height: 180.0,
-              ),
-              child: Image.network(video.thumbnailUrl, fit: BoxFit.cover),
-              // Image(
-              //   width: 350.0,
-              //   height: 250.0,
-              //   image: NetworkImage(video.thumbnailUrl),
-              //   fit: BoxFit.fill,
-              // ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Colors.white,
-      ),
-      home: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          endDrawer: NavDrawer(),
-          appBar: AppBar(
-            bottom: TabBar(
-              tabs: [
-                Tab(text: "Videos"),
-                Tab(text: "Home"),
-              ],
-            ),
-            title: Image.asset(
-              'assets/images/LogoIglesiaNuevaTemporada-1.png',
-              height: 70,
-              width: 100,
-            ),
+    return Scaffold(
+        endDrawer: NavDrawer(),
+        appBar: AppBar(
+          title: Image.asset(
+            'assets/images/LogoIglesiaNuevaTemporada-1.png',
+            height: 70,
+            width: 100,
           ),
-          body: _channel != null
-              ? NotificationListener<ScrollNotification>(
-                  onNotification: (ScrollNotification scrollDetails) {
-                    if (!_isLoading &&
-                        _channel.videos.length !=
-                            int.parse(_channel.videoCount) &&
-                        scrollDetails.metrics.pixels ==
-                            scrollDetails.metrics.maxScrollExtent) {
-                      _loadMoreVideos();
-                    }
-                    return false;
-                  },
-                  child: TabBarView(children: [
-                    ListView.builder(
-                      itemCount: 1 + _channel.videos.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        // if (index == 0) {
-                        //   // return _buildProfileInfo();
-                        // }
-                        if (index == 0) {
-                          Video video = _channel.videos[0];
-                          return _buildTopVideo(video);
-                        }
-                        Video video = _channel.videos[index - 1];
-                        return _buildVideo(video);
-                      },
-                    ),
-                    Center(
-                      child: TopVideoScreen(id: 'bmVKaAV_7-A'),
-                    ),
-                    //tab 2
-                  ]),
-                )
-              : Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ),
         ),
-      ),
-    );
+        bottomNavigationBar: MotionTabBar(
+          labels: ["Videos", "Home", "Informacion"],
+          initialSelectedTab: "Home",
+          tabIconColor: Colors.teal,
+          tabSelectedColor: Colors.teal,
+          onTabItemSelected: (int value) {
+            print(value);
+            setState(() {
+              _tabController.index = value;
+            });
+          },
+          icons: [Icons.menu, Icons.home, Icons.menu],
+          textStyle: TextStyle(color: Colors.teal),
+        ),
+        body: MotionTabBarView(
+          controller: _tabController,
+          children: <Widget>[
+            Container(
+              child: Center(
+                  child: _channel != null
+                      ? NotificationListener<ScrollNotification>(
+                          onNotification: (ScrollNotification scrollDetails) {
+                            if (!_isLoading &&
+                                _channel.videos.length !=
+                                    int.parse(_channel.videoCount) &&
+                                scrollDetails.metrics.pixels ==
+                                    scrollDetails.metrics.maxScrollExtent) {
+                              _loadMoreVideos();
+                            }
+                            return false;
+                          },
+                          child: ListView.builder(
+                            itemCount: 1 + _channel.videos.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              if (index == 0) {
+                                return _buildProfileInfo();
+                              }
+                              // if (index == 0) {
+                              //   Video video = _channel.videos[5];
+                              //   return _buildTopVideo(video);
+                              // }
+                              Video video = _channel.videos[index - 1];
+                              return _buildVideo(video);
+                            },
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+            ),
+            Container(
+              child: TopVideoScreen(id: 'L1zgwfXPAfw'),
+            ),
+            Container(
+              child: Center(
+                child: Text("Dashboard"),
+              ),
+            ),
+          ],
+        ));
   }
 }
-// WebView(
-//                         initialUrl: 'https://iglesianuevatemporada.org/',
-//                         javascriptMode: JavascriptMode.unrestricted,
-//                       ),

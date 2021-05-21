@@ -25,7 +25,6 @@ class _TopVideoScreenState extends State<TopVideoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: YoutubePlayer(
         controller: _controller,
         showVideoProgressIndicator: true,
