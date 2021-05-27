@@ -3,12 +3,10 @@ import 'package:nueva_temporada/models/channel_model.dart';
 import 'package:nueva_temporada/models/video_model.dart';
 import 'package:nueva_temporada/screens/video_screen.dart';
 import 'package:nueva_temporada/widgets/nav-drawer.dart';
-import 'package:nueva_temporada/widgets/motionbar.dart';
+import 'package:nueva_temporada/landing_page.dart';
 import 'package:nueva_temporada/widgets/topvideos.dart';
 import 'package:nueva_temporada/services/api_service.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 //import 'package:webview_flutter/webview_flutter.dart';
-
 import 'package:motion_tab_bar/MotionTabBarView.dart';
 import 'package:motion_tab_bar/MotionTabController.dart';
 import 'package:motion_tab_bar/motiontabbar.dart';
@@ -339,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             Container(
               child: Center(
-                child: Text("Dashboard"),
+                child: LandingPage(),
               ),
             ),
           ],
