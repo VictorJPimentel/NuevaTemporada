@@ -18,14 +18,14 @@ class _TopVideoScreenState extends State<TopVideoScreen> {
     super.initState();
     _controller = YoutubePlayerController(
       initialVideoId: widget.id,
-      flags: YoutubePlayerFlags(mute: false, autoPlay: true, isLive: true),
+      flags: YoutubePlayerFlags(mute: false, autoPlay: true, isLive: false),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: YoutubePlayer(
+    return Container(
+      child: YoutubePlayer(
         controller: _controller,
         showVideoProgressIndicator: true,
         onReady: () {

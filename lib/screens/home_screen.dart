@@ -3,13 +3,15 @@ import 'package:nueva_temporada/models/channel_model.dart';
 import 'package:nueva_temporada/models/video_model.dart';
 import 'package:nueva_temporada/screens/video_screen.dart';
 import 'package:nueva_temporada/widgets/nav-drawer.dart';
-import 'package:nueva_temporada/landing_page.dart';
+// import 'package:nueva_temporada/landing_page.dart';
 import 'package:nueva_temporada/widgets/topvideos.dart';
 import 'package:nueva_temporada/services/api_service.dart';
 //import 'package:webview_flutter/webview_flutter.dart';
 import 'package:motion_tab_bar/MotionTabBarView.dart';
 import 'package:motion_tab_bar/MotionTabController.dart';
 import 'package:motion_tab_bar/motiontabbar.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -168,56 +170,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _isLoading = false;
   }
 
-  // _buildTopVideo(Video video) {
-  //   return GestureDetector(
-  //     onTap: () => Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (_) => VideoScreen(id: video.id),
-  //       ),
-  //     ),
-  //     child: Container(
-  //       padding: EdgeInsets.all(5.0),
-  //       height: 260.0,
-  //       child: Column(
-  //         children: <Widget>[
-  //           Container(
-  //             padding: EdgeInsets.all(10.0),
-  //             width: 1000.0,
-  //             height: 50.0,
-  //             decoration: new BoxDecoration(
-  //               color: Colors.teal,
-  //               borderRadius: new BorderRadius.only(
-  //                   bottomLeft: const Radius.circular(40.0),
-  //                   bottomRight: const Radius.circular(40.0),
-  //                   topLeft: const Radius.circular(40.0),
-  //                   topRight: const Radius.circular(40.0)),
-  //             ),
-  //             child: Text(
-  //               video.title,
-  //               style: TextStyle(
-  //                 color: Colors.white,
-  //                 fontSize: 14.0,
-  //               ),
-  //             ),
-  //           ),
-  //           Container(
-  //             constraints: BoxConstraints.expand(
-  //               height: 180.0,
-  //             ),
-  //             child: Image.network(video.thumbnailUrl, fit: BoxFit.cover),
-  //             // Image(
-  //             //   width: 350.0,
-  //             //   height: 250.0,
-  //             //   image: NetworkImage(video.thumbnailUrl),
-  //             //   fit: BoxFit.fill,
-  //             // ),
-  //           )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  _buildTopVideo() {
+    return TopVideoScreen(id: 'L1zgwfXPAfw');
+  }
 
   _buildProfileInfo() {
     return Container(
@@ -273,6 +228,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  WebViewController _webViewController;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -285,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
         bottomNavigationBar: MotionTabBar(
-          labels: ["Videos", "Home", "Informacion"],
+          labels: ["Videos", "Home", "Noticias"],
           initialSelectedTab: "Home",
           tabIconColor: Colors.teal,
           tabSelectedColor: Colors.teal,
@@ -318,13 +275,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: ListView.builder(
                             itemCount: 1 + _channel.videos.length,
                             itemBuilder: (BuildContext context, int index) {
+                              if (index == 1) {
+                                return _buildTopVideo();
+                              }
                               if (index == 0) {
                                 return _buildProfileInfo();
                               }
-                              // if (index == 0) {
-                              //   Video video = _channel.videos[5];
-                              //   return _buildTopVideo(video);
-                              // }
                               Video video = _channel.videos[index - 1];
                               return _buildVideo(video);
                             },
@@ -333,12 +289,56 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       : const SizedBox.shrink()),
             ),
             Container(
-              child: TopVideoScreen(id: 'L1zgwfXPAfw'),
+              child: Builder(builder: (BuildContext context) {
+                return WebView(
+                  initialUrl: 'https://iglesianuevatemporada.org',
+                  javascriptMode: JavascriptMode.unrestricted,
+                  onWebViewCreated: (WebViewController webViewController) {
+                    _webViewController = webViewController;
+                  },
+                  onPageFinished: (String url) {
+                    print('Page finished loading: $url');
+
+                    _webViewController
+                        .evaluateJavascript("javascript:(function() { " +
+                            "var head = document.getElementsByTagName('header')[0];" +
+                            "head.parentNode.removeChild(head);" +
+                            "var footer = document.getElementsByTagName('footer')[0];" +
+                            "footer.parentNode.removeChild(footer);" +
+                            "})()")
+                        .then((value) =>
+                            debugPrint('Page finished loading Javascript'))
+                        .catchError((onError) => debugPrint('$onError'));
+                  },
+                  gestureNavigationEnabled: true,
+                );
+              }),
             ),
             Container(
-              child: Center(
-                child: LandingPage(),
-              ),
+              child: Builder(builder: (BuildContext context) {
+                return WebView(
+                  initialUrl: 'https://iglesianuevatemporada.org/noticias',
+                  javascriptMode: JavascriptMode.unrestricted,
+                  onWebViewCreated: (WebViewController webViewController) {
+                    _webViewController = webViewController;
+                  },
+                  onPageFinished: (String url) {
+                    print('Page finished loading: $url');
+
+                    _webViewController
+                        .evaluateJavascript("javascript:(function() { " +
+                            "var head = document.getElementsByTagName('header')[0];" +
+                            "head.parentNode.removeChild(head);" +
+                            "var footer = document.getElementsByTagName('footer')[0];" +
+                            "footer.parentNode.removeChild(footer);" +
+                            "})()")
+                        .then((value) =>
+                            debugPrint('Page finished loading Javascript'))
+                        .catchError((onError) => debugPrint('$onError'));
+                  },
+                  gestureNavigationEnabled: true,
+                );
+              }),
             ),
           ],
         ));

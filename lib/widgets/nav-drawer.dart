@@ -13,10 +13,11 @@ class NavDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.white, fontSize: 25),
             ),
             decoration: BoxDecoration(
-                color: Colors.teal,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('assets/images/cover.jpg'))),
+              color: Colors.teal,
+              // image: DecorationImage(
+              //     fit: BoxFit.fill,
+              //     image: AssetImage('assets/images/cover.jpg'))
+            ),
           ),
           ListTile(
             leading: Icon(Icons.verified_user),
