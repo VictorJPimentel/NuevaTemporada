@@ -23,6 +23,14 @@ workflows:
       - ...
     artifacts:
       - build/**/outputs/**/*.aab
+      - build/**/outputs/**/*.apk                   # relative path for a project in root directory
+      - subfolder_name/build/**/outputs/**/*.apk    # relative path for a project in subfolder
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - build/ios/ipa/*.ipa
+      - build/macos/**/*.pkg
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
     publishing:
       email:
         recipients:
