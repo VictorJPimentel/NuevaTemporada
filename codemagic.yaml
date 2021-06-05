@@ -11,6 +11,11 @@ workflows:
     cache:
       cache_paths:
         - ~/.pub-cache
+  build-android:
+    name: Build All
+    scripts:
+      - name: Build Android
+        script: ./gradlew assembleDebug
     triggering:
       events:
         - push
