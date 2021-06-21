@@ -317,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Container(
               child: Builder(builder: (BuildContext context) {
                 return WebView(
-                  initialUrl: 'https://iglesianuevatemporada.orflug/noticias',
+                  initialUrl: 'https://iglesianuevatemporada.org/noticias',
                   javascriptMode: JavascriptMode.unrestricted,
                   onWebViewCreated: (WebViewController webViewController) {
                     _webViewController = webViewController;
